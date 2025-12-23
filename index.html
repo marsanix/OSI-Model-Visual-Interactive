@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OSI Model Interactive Learning</title>
+  <link rel="stylesheet" href="./src/style.css?v=fixed4" />
+</head>
+
+<body>
+  <header>
+    <h1>OSI Model <span style="font-weight: 300; color: #fff; opacity:0.8">Interactive</span></h1>
+    <div style="font-size: 0.9rem; opacity: 0.7;">Click a layer to explore</div>
+
+    <div style="display:flex; gap:1rem; align-items:center;">
+      <button id="sim-btn" class="sim-btn">🎬 Simulasi</button>
+
+      <!-- Language Switcher -->
+      <button id="lang-toggle" class="lang-btn">
+        <span class="lang-icon">🌐</span>
+        <span id="lang-text" class="lang-text">ID 🇮🇩</span>
+      </button>
+    </div>
+  </header>
+
+  <div id="app-container">
+    <div class="bg-gradient"></div>
+
+    <div id="comparison-grid" class="comparison-grid">
+      <h3 class="grid-header osi-header">OSI Model</h3>
+      <h3 class="grid-header tcp-header">TCP/IP Model</h3>
+
+      <!-- Flow Arrows -->
+      <div class="flow-indicator flow-down">
+        <div class="flow-label">Data Transmission (Encapsulation)</div>
+        <div class="flow-line"></div>
+        <div class="flow-arrowhead">▼</div>
+      </div>
+
+      <div class="flow-indicator flow-up">
+        <div class="flow-label">Data Reception (Decapsulation)</div>
+        <div class="flow-line"></div>
+        <div class="flow-arrowhead">▲</div>
+      </div>
+      <!-- Javascript will populate cards here -->
+    </div>
+
+    <!-- Right Side: Detail View -->
+    <div id="detail-panel" class="detail-panel">
+      <div id="detail-number" class="detail-number"></div>
+      <div id="detail-content" class="detail-content">
+        <!-- Default Welcome State -->
+        <div style="text-align: center; opacity: 0.5;">
+          <h2>Select a layer to begin</h2>
+          <p>Explore the 7 layers of the OSI Model</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="protocol-modal" class="modal-overlay">
+    <div class="modal-content">
+      <button class="modal-close">&times;</button>
+
+      <div class="modal-header">
+        <h2 id="modal-title">Protocol Name</h2>
+        <span id="modal-subtitle">Protocol Description Keyword</span>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-section">
+          <h3>Explanation & Usage</h3>
+          <p id="modal-desc">Description text goes here...</p>
+          <div id="modal-usecases" class="use-case-box">
+            <strong>Use Cases:</strong> <span>Examples...</span>
+          </div>
+        </div>
+
+        <div class="modal-section security-section">
+          <h3>🛡️ Cybersecurity Context</h3>
+
+          <div class="security-grid">
+            <div class="risk-col">
+              <h4>⚠️ Common Attacks / Risks</h4>
+              <ul id="modal-risks" class="security-list risk-list">
+                <!-- Risks -->
+              </ul>
+            </div>
+
+            <div class="mitigation-col">
+              <h4>🔒 Security & Mitigation</h4>
+              <ul id="modal-mitigations" class="security-list mitigation-list">
+                <!-- Mitigations -->
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div id="modal-refs-container">
+          <!-- References -->
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+
+</html>

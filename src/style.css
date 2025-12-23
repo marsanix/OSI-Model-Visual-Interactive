@@ -1,0 +1,1560 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
+
+:root {
+  --bg-color: #0f172a;
+  --text-color: #e2e8f0;
+  --accent-color: #38bdf8;
+  --card-bg: rgba(30, 41, 59, 0.7);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+  --font-main: 'Outfit', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  overflow: hidden;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  padding: 1rem 2rem;
+  background: rgba(15, 23, 42, 0.9);
+  border-bottom: var(--glass-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+  height: 60px;
+}
+
+h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: linear-gradient(to right, #38bdf8, #818cf8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+h1 span {
+  -webkit-text-fill-color: #fff;
+  font-weight: 300;
+  opacity: 0.8;
+}
+
+.lang-btn {
+  /* position: absolute removed */
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  backdrop-filter: blur(5px);
+  transition: all 0.3s ease;
+  z-index: 1000;
+  white-space: nowrap;
+}
+
+.lang-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.lang-icon {
+  font-size: 1.1rem;
+}
+
+/* --- Simulation Styles --- */
+#simulation-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(10px);
+  z-index: 2000;
+  display: none;
+  /* Hidden by default */
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+.sim-container {
+  width: 90%;
+  max-width: 1000px;
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.sim-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 1rem;
+}
+
+.sim-stage {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  /* Align top for stacks */
+  position: relative;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+  padding: 2rem;
+  overflow: hidden;
+  /* For packet flying */
+}
+
+.sim-stack {
+  width: 30%;
+  /* Fixed width for better control */
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+  z-index: 2;
+  /* Above wire */
+}
+
+.stack-label {
+  text-align: center;
+  margin-bottom: 1rem;
+  font-weight: bold;
+  color: #aaa;
+}
+
+.sim-layer {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.8rem;
+  border-radius: 4px;
+  display: flex;
+  gap: 1rem;
+  font-size: 0.9rem;
+  transition: background 0.3s;
+}
+
+.sim-layer-id {
+  font-weight: bold;
+  opacity: 0.5;
+  width: 20px;
+}
+
+
+/* Old sim-wire removed/hidden */
+.sim-wire {
+  display: none;
+}
+
+/* Global (Desktop & Base) Cable Graphic */
+.cable-graphic {
+  position: absolute;
+  /* Controlled by JS */
+  height: 120px !important;
+  /* Deep vertical drop for visibility */
+  border-bottom: 4px solid #555;
+  border-left: 4px solid #555;
+  border-right: 4px solid #555;
+  background: transparent;
+  border-radius: 0 0 10px 10px;
+  pointer-events: none;
+  z-index: 5;
+  /* Ensure visible on top of stacks */
+  /* Width, Left, Bottom set by JS */
+}
+
+.cable-connector {
+  width: 10px !important;
+  height: 10px !important;
+  background: #777;
+  position: absolute;
+  top: -5px;
+  /* Vertically centered on line tip */
+}
+
+.cable-connector.left {
+  left: -6px !important;
+  /* Centered on 4px border */
+}
+
+.cable-connector.right {
+  right: -6px !important;
+  /* Centered on 4px border */
+}
+
+.sim-packet {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  background: #FF6B6B;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.7rem;
+  font-weight: bold;
+  z-index: 10;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  /* Init hidden */
+  color: #000;
+}
+
+/* Toolbar Layout */
+.sim-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.8rem;
+}
+
+/* Absolute Close Button */
+.sim-icon-btn.close-absolute {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: rgba(0, 0, 0, 0.2);
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.2s;
+  z-index: 20;
+}
+
+.sim-icon-btn.close-absolute:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  transform: rotate(90deg);
+}
+
+.sim-icon-btn.close {
+  /* Legacy class kept just in case, but unused now */
+  display: none;
+}
+
+.sim-icon-btn.close:hover {
+  color: #ef4444;
+  transform: scale(1.1);
+}
+
+.sim-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 0.5rem;
+  border-radius: 12px;
+}
+
+.sim-playback-group {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.sim-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  backdrop-filter: blur(5px);
+  transition: all 0.3s ease;
+  z-index: 1000;
+  white-space: nowrap;
+}
+
+.sim-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.sim-btn.primary {
+  background: var(--accent-color);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.sim-btn.primary:hover {
+  background: #0ea5e9;
+  transform: translateY(-1px);
+}
+
+.sim-btn.secondary {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sim-btn.secondary:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.sim-btn.danger {
+  background: #ef4444;
+}
+
+.speed-control {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  /* background: removed background to blend with toolbar */
+  padding: 0 0.5rem;
+}
+
+.speed-control input[type="range"] {
+  width: 80px;
+  cursor: pointer;
+  accent-color: var(--accent-color);
+}
+
+#sim-speed-value {
+  font-weight: bold;
+  font-size: 0.8rem;
+  min-width: 25px;
+  text-align: right;
+  opacity: 0.8;
+}
+
+/* Simulation Type Selector */
+.sim-type-selector {
+  display: flex;
+  gap: 0.3rem;
+  margin-bottom: 0;
+  /* Reset margin */
+}
+
+.sim-type-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.6);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+}
+
+.sim-type-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.sim-type-btn.active {
+  background: var(--accent-color);
+  color: white;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+}
+
+.sim-log-panel {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 1rem;
+  border-radius: 8px;
+  font-family: monospace;
+  color: var(--accent-color);
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+}
+
+.pc-icon {
+  font-size: 3rem;
+  text-align: center;
+  margin-bottom: 0.5rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.cable-graphic {
+  position: absolute;
+  bottom: 40px;
+  left: 0;
+  right: 0;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cable-line {
+  width: 100%;
+  height: 6px;
+  background: linear-gradient(90deg, #333, #555, #333);
+  border-radius: 3px;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.cable-connector {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: #444;
+  border: 2px solid #666;
+  border-radius: 3px;
+}
+
+.cable-connector.left {
+  left: 0;
+}
+
+.cable-connector.right {
+  right: 0;
+}
+
+#app-container {
+  display: flex;
+  height: calc(100vh - 60px);
+  position: relative;
+  overflow: hidden;
+}
+
+/* --- Connector Lines --- */
+.connections-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  /* Below cards (z:5) but above bg */
+}
+
+/* --- Comparison Layout (Absolute Positioning) --- */
+.comparison-grid {
+  flex: 0 0 55%;
+  position: relative;
+  display: block;
+  padding: 1rem;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.grid-header {
+  position: absolute;
+  top: 1rem;
+  /* Aligned with top padding */
+  height: 40px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  color: var(--accent-color);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.9rem;
+  width: 45%;
+  /* Matches JS width logic */
+}
+
+.osi-header {
+  left: 1rem;
+}
+
+.tcp-header {
+  right: 1rem;
+}
+
+.layer-card {
+  position: absolute;
+  /* Top, Left, Width, Height controlled by JS */
+  background: var(--card-bg);
+  border: var(--glass-border);
+  padding: 0 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s, box-shadow 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  overflow: visible;
+  /* Changed from hidden to allow tooltips to pop out */
+}
+
+.tcp-card {
+  border-right: 2px solid rgba(255, 255, 255, 0.05);
+}
+
+.layer-card:hover,
+.layer-card.active {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: rgba(56, 189, 248, 0.5);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  z-index: 100 !important;
+  /* Ensure hovered card is comfortably above others for tooltip visibility */
+}
+
+.layer-card:hover {
+  border-color: rgba(56, 189, 248, 0.8);
+}
+
+.layer-card.active {
+  background: rgba(56, 189, 248, 0.25);
+  border-color: #38bdf8;
+  box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+}
+
+.layer-id {
+  font-size: 1.2rem;
+  font-weight: 700;
+  opacity: 0.6;
+  width: 30px;
+  flex-shrink: 0;
+}
+
+.layer-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.layer-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.layer-subtitle {
+  font-size: 0.75rem;
+  display: none;
+}
+
+.layer-card:hover .layer-subtitle {
+  display: block;
+  position: absolute;
+  bottom: 0px;
+  left: 0;
+  right: 0;
+  background: rgba(15, 23, 42, 0.95);
+  padding: 4px 1rem;
+  z-index: 10;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.layer-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.pdu-badge {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.5px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  margin-left: auto;
+  /* Push to right */
+  position: relative;
+  /* For Tooltip Anchor */
+  cursor: help;
+}
+
+.pdu-badge:hover .tooltip {
+  opacity: 1;
+  visibility: visible;
+  bottom: 120%;
+  /* Show above */
+}
+
+.pdu-tooltip {
+  width: 200px;
+  text-transform: none;
+  line-height: 1.4;
+  text-align: center;
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* --- Detail Panel --- */
+.detail-panel {
+  flex: 1;
+  padding: 3rem;
+  background: rgba(15, 23, 42, 0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  position: relative;
+  overflow-y: auto;
+}
+
+.detail-content {
+  opacity: 0;
+  transform: translateY(20px);
+  width: 100%;
+}
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.detail-number {
+  font-size: 4rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.05);
+  line-height: 1;
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+}
+
+.detail-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.detail-desc {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+  color: #cad5e1;
+}
+
+.detail-section-title {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--accent-color);
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.protocol-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-bottom: 2rem;
+}
+
+.tag {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tag:hover {
+  background: var(--accent-color);
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.ports-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 1rem;
+  width: 100%;
+}
+
+.port-item {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.8rem;
+  border-radius: 8px;
+  text-align: center;
+  cursor: help;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.port-item:hover {
+  border-color: var(--accent-color);
+  background: rgba(56, 189, 248, 0.1);
+}
+
+.port-number {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--accent-color);
+  display: block;
+}
+
+.port-service {
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+/* Tooltip */
+.tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #334155;
+  color: #fff;
+  padding: 0.5rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  width: max-content;
+  max-width: 150px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 100;
+  margin-bottom: 6px;
+}
+
+.tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #334155 transparent transparent transparent;
+}
+
+.port-item:hover .tooltip {
+  opacity: 1;
+}
+
+.bg-gradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.1), transparent 60%);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* --- References Section --- */
+.ref-section {
+  width: 100%;
+  margin-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 1.5rem;
+  padding-bottom: 2rem;
+}
+
+details.ref-details {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+summary.ref-summary {
+  padding: 1rem;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--accent-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  list-style: none;
+  /* Hide default marker */
+  transition: background-color 0.2s;
+}
+
+summary.ref-summary::-webkit-details-marker {
+  display: none;
+}
+
+summary.ref-summary:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+summary.ref-summary::after {
+  content: '+';
+  font-size: 1.2rem;
+  font-weight: 400;
+  transition: transform 0.2s;
+}
+
+details[open] summary.ref-summary::after {
+  transform: rotate(45deg);
+}
+
+.ref-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ref-item {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.ref-link {
+  padding: 0.8rem 1rem;
+  color: #cad5e1;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ref-link:hover {
+  background: rgba(56, 189, 248, 0.1);
+  color: #fff;
+  padding-left: 1.2rem;
+}
+
+.ref-link::before {
+  content: "🔗";
+  font-size: 0.8rem;
+  opacity: 0.5;
+}
+
+/* --- MODAL STYLES --- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-content {
+  background: #1e293b;
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  transform: scale(0.95);
+  transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+.modal-overlay.active .modal-content {
+  transform: scale(1);
+}
+
+.modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1.5rem;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 2rem;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: 0.2s;
+  z-index: 10;
+}
+
+.modal-close:hover {
+  opacity: 1;
+  transform: scale(1.1);
+  color: #ef4444;
+}
+
+.modal-header {
+  padding: 2rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+#modal-title {
+  color: var(--accent-color);
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+#modal-subtitle {
+  opacity: 0.7;
+  font-size: 1.1rem;
+}
+
+.modal-body {
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+.modal-section {
+  margin-bottom: 2.5rem;
+}
+
+.modal-section h3 {
+  color: #fff;
+  margin-bottom: 1rem;
+  border-left: 4px solid var(--accent-color);
+  padding-left: 1rem;
+}
+
+.use-case-box {
+  background: rgba(56, 189, 248, 0.1);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-top: 1rem;
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  color: #e2e8f0;
+}
+
+.security-section {
+  background: rgba(239, 68, 68, 0.05);
+  /* Red tint */
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid rgba(239, 68, 68, 0.1);
+}
+
+.security-section h3 {
+  border-left-color: #ef4444;
+}
+
+.security-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.risk-col h4 {
+  color: #fca5a5;
+  margin-bottom: 1rem;
+}
+
+.mitigation-col h4 {
+  color: #86efac;
+  margin-bottom: 1rem;
+}
+
+.security-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.security-list li {
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.risk-list li::before {
+  content: "⚠️";
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.mitigation-list li::before {
+  content: "✅";
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+@media(max-width: 768px) {
+  .security-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --- Flow Arrows --- */
+.flow-indicator {
+  position: absolute;
+  top: 60px;
+  /* Below header */
+  bottom: 20px;
+  width: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+  font-weight: 600;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.flow-down {
+  left: 10px;
+}
+
+.flow-up {
+  right: 15px;
+  /* Adjust for scrollbar if any */
+  flex-direction: column-reverse;
+}
+
+.flow-indicator .flow-label {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  white-space: nowrap;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  opacity: 0.7;
+}
+
+.flow-line {
+  flex: 1;
+  width: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 10px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.flow-line::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  background: linear-gradient(to bottom, transparent, var(--accent-color), transparent);
+  animation: flowStream 2s linear infinite;
+}
+
+.flow-up .flow-line::after {
+  animation-direction: reverse;
+}
+
+@keyframes flowStream {
+  0% {
+    top: -50%;
+  }
+
+  100% {
+    top: 100%;
+  }
+}
+
+.flow-arrowhead {
+  font-size: 1.2rem;
+  line-height: 1;
+  color: var(--accent-color);
+  text-shadow: 0 0 10px var(--accent-color);
+  animation: arrowPulse 2s infinite;
+}
+
+@keyframes arrowPulse {
+
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+.flow-up .flow-label {
+  margin-top: 10px;
+  margin-bottom: 0;
+}
+
+/* ===================== RESPONSIVE DESIGN ===================== */
+
+/* Tablet (max-width: 1024px) */
+@media (max-width: 1024px) {
+  header {
+    flex-wrap: wrap;
+    height: auto;
+    padding: 0.75rem 1rem;
+    gap: 0.5rem;
+  }
+
+  h1 {
+    font-size: 1.2rem;
+  }
+
+  .comparison-grid {
+    gap: 10px;
+  }
+
+  .layer-card {
+    padding: 0.6rem 0.8rem;
+  }
+
+  .layer-title {
+    font-size: 0.85rem;
+  }
+
+  #detail-panel {
+    width: 280px;
+    padding: 1rem;
+  }
+}
+
+/* Mobile (max-width: 768px) */
+@media (max-width: 768px) {
+  body {
+    overflow-y: auto;
+    height: auto;
+  }
+
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    height: auto;
+  }
+
+  header>div:last-child {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  h1 {
+    font-size: 1rem;
+  }
+
+  .lang-btn {
+    padding: 5px 10px;
+    font-size: 0.75rem;
+  }
+
+  #sim-btn {
+    font-size: 0.7rem !important;
+    padding: 4px 10px !important;
+  }
+
+  /* App Container: Stack vertically - Grid on top, Detail below */
+  #app-container {
+    flex-direction: column;
+    height: auto;
+    min-height: calc(100vh - 100px);
+    overflow: visible;
+  }
+
+  /* Comparison Grid: Auto height, use CSS Grid for equal distribution */
+  .comparison-grid {
+    flex: none;
+    width: 100%;
+    height: auto !important;
+    padding: 0.5rem;
+    overflow: visible;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    grid-auto-flow: dense;
+    /* Fill gaps - TCP cards start from row 2 */
+    gap: 0.3rem;
+  }
+
+  /* Grid Headers - span full width of their column */
+  .grid-header {
+    position: static !important;
+    font-size: 0.75rem;
+    padding: 0.3rem;
+    text-align: center;
+    left: auto !important;
+    right: auto !important;
+  }
+
+  .osi-header {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .tcp-header {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  /* Hide elements not needed on mobile */
+  .layer-icon {
+    display: none !important;
+  }
+
+  .pdu-badge {
+    display: none !important;
+  }
+
+  .connections-svg {
+    display: none !important;
+  }
+
+  .flow-down,
+  .flow-up {
+    display: none !important;
+  }
+
+  /* Layer Cards: Auto height with minimum padding for text */
+  .layer-card {
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    /* Auto height based on content */
+    min-height: 2rem;
+    /* Minimum height for text + padding */
+    top: auto !important;
+    left: auto !important;
+    padding: 0.4rem 0.5rem;
+    gap: 0.3rem;
+    margin-bottom: 0.25rem;
+  }
+
+  /* Keep OSI cards in column 1, TCP cards in column 2 */
+  .layer-card.osi-card {
+    grid-column: 1;
+  }
+
+  .layer-card.tcp-card {
+    grid-column: 2;
+  }
+
+  /* TCP Layer 4 (Application) spans 3 rows = OSI 5,6,7 */
+  .layer-card.tcp-card[data-id="4"] {
+    grid-row: span 3;
+  }
+
+  /* TCP Layer 3 (Transport) spans 1 row = OSI 4 */
+  .layer-card.tcp-card[data-id="3"] {
+    grid-row: span 1;
+  }
+
+  /* TCP Layer 2 (Internet) spans 1 row = OSI 3 */
+  .layer-card.tcp-card[data-id="2"] {
+    grid-row: span 1;
+  }
+
+  /* TCP Layer 1 (Network Access) spans 2 rows = OSI 1,2 */
+  .layer-card.tcp-card[data-id="1"] {
+    grid-row: span 2;
+  }
+
+  .layer-id {
+    font-size: 0.8rem;
+    width: 18px;
+  }
+
+  .layer-title {
+    font-size: 0.7rem;
+  }
+
+  .layer-subtitle {
+    display: none !important;
+  }
+
+  /* Detail Panel: Show at bottom, always visible */
+  #detail-panel {
+    position: relative !important;
+    width: 100% !important;
+    flex: 1;
+    order: 2;
+    /* Put below grid */
+    border-radius: 16px 16px 0 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    min-height: 40vh;
+    max-height: none;
+    overflow-y: auto;
+  }
+
+  .detail-title {
+    font-size: 1.1rem;
+  }
+
+  .detail-desc {
+    font-size: 0.85rem;
+  }
+
+  /* Modal full width on mobile */
+  .modal-content {
+    width: 95%;
+    max-height: 85vh;
+    padding: 1rem;
+  }
+
+  .modal-header h2 {
+    font-size: 1.3rem;
+  }
+
+  .security-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Simulation Overlay Mobile */
+  #simulation-overlay {
+    padding: 0.5rem;
+  }
+
+  .sim-container {
+    width: 100%;
+    height: 95vh;
+  }
+
+  .sim-header {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+
+  .sim-header h2 {
+    font-size: 1rem;
+  }
+
+  .sim-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .sim-playback-group {
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .sim-type-selector {
+    width: 100%;
+  }
+
+  .sim-type-btn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .speed-control {
+    margin-right: 0;
+    padding: 0.3rem 0.5rem;
+  }
+
+  .speed-control input[type="range"] {
+    width: 60px;
+  }
+
+  .sim-btn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.75rem;
+  }
+
+  .sim-stage {
+    flex-direction: row !important;
+    gap: 7rem;
+    padding: 0.5rem;
+    justify-content: center;
+    align-items: flex-start;
+    position: relative;
+    padding-bottom: 4rem;
+    /* Increased space for packet visibility */
+    height: auto !important;
+    /* Hug content */
+    flex: 0 0 auto !important;
+    /* Don't expand */
+    overflow: hidden;
+  }
+
+  .sim-stack {
+    width: 48%;
+    /* Split width roughly in half */
+    flex: 1;
+    max-width: none;
+  }
+
+  .pc-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .stack-label {
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .sim-layer {
+    padding: 0.4rem 0.2rem;
+    font-size: 0.7rem;
+    min-height: 25px;
+    display: flex;
+    align-items: center;
+    border-left-width: 3px !important;
+  }
+
+  .sim-layer-id {
+    width: 15px;
+    font-size: 0.7rem;
+  }
+
+  .sim-wire-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 4rem;
+    /* Taller for U-shape */
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  .sim-wire {
+    bottom: 50%;
+  }
+
+  /* U-shaped Cable Graphic */
+  /* U-shaped Cable Graphic - Default (Desktop) */
+  .cable-graphic {
+    width: 65%;
+    /* Default width spanning gap */
+    position: absolute;
+    bottom: 0.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 30px;
+    border-bottom: 4px solid #555;
+    border-left: 4px solid #555;
+    border-right: 4px solid #555;
+    background: transparent;
+    border-radius: 0 0 10px 10px;
+    max-width: 800px;
+    /* Cap width on large screens */
+  }
+
+  .cable-line {
+    display: none;
+    /* Hide default straight line */
+  }
+
+  .cable-connector {
+    width: 10px;
+    height: 10px;
+    background: #777;
+    position: absolute;
+    top: -5px;
+    /* Connects to bottom of L1 */
+  }
+
+  .cable-connector.left {
+    left: -7px;
+    top: -10px;
+  }
+
+  .cable-connector.right {
+    right: -7px;
+    top: -10px;
+  }
+
+  .sim-packet {
+    width: 30px;
+    height: 30px;
+    font-size: 0.6rem;
+  }
+
+  .sim-log-panel {
+    font-size: 0.75rem;
+    min-height: 50px;
+    padding: 0.5rem;
+  }
+
+  .sim-log-panel {
+    font-size: 0.75rem;
+    min-height: 50px;
+  }
+}
+
+/* Small Mobile (max-width: 480px) */
+@media (max-width: 480px) {
+  h1 {
+    font-size: 0.95rem;
+  }
+
+  h1 span {
+    display: none;
+    /* Hide "Interactive" on very small screens */
+  }
+
+  .layer-card {
+    padding: 0.4rem;
+  }
+
+  .layer-id {
+    font-size: 0.9rem;
+    width: 20px;
+  }
+
+  .layer-icon {
+    display: none;
+    /* Hide icons on very small screens */
+  }
+
+  .pdu-badge {
+    display: none;
+    /* Hide PDU badge on very small screens */
+  }
+
+  #detail-panel {
+    max-height: 60vh;
+  }
+}
