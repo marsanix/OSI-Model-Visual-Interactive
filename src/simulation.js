@@ -546,6 +546,7 @@ function runHttpSimulation() {
     const isMobile = () => true;
 
     // Helper for Wire Animation Path (Repeated for local scope or move to outer scope, but keeping local for now)
+    // Helper for Wire Animation Path (Corrected to use getBoundingClientRect handles nesting)
     const animateWire = (direction) => {
         const isMob = isMobile();
         const startSide = direction === 'tx' ? 'sender' : 'receiver';
@@ -565,31 +566,51 @@ function runHttpSimulation() {
 
         const color = direction === 'tx' ? "#38bdf8" : "#22c55e"; // Blue for req, Green for resp
 
+        // Calculate positions relative to stage (Robust method)
+        const stage = document.querySelector('.sim-stage');
+        const startRect = startL1.getBoundingClientRect();
+        const endRect = endL1.getBoundingClientRect();
+        const stageRect = stage.getBoundingClientRect();
+        const cable = document.querySelector('.cable-graphic');
+
+        // Fallback if cable not found
+        const cableBottomY = cable ? cable.getBoundingClientRect().bottom : (stageRect.bottom - 5);
+        // Wire Y position: Align center of packet with bottom of cable graphic
+        const wireY = (cableBottomY - stageRect.top) - 20;
+
+        // Start/End Connectors
+        const startX = startRect.left - stageRect.left + (startRect.width / 2) - 15;
+        const endX = endRect.left - stageRect.left + (endRect.width / 2) - 15;
+        const endY = endRect.top - stageRect.top + 10;
+
         if (isMob) {
+            // 1. Move down from Start L1 to Wire Level
             tl.to(packet, {
-                top: startL1.offsetTop + startL1.offsetHeight + 10,
-                left: startL1.offsetLeft + (startL1.offsetWidth / 2) - 15,
+                top: wireY,
+                left: startX,
                 duration: wireDur * 0.3,
                 ease: "power1.in",
-                backgroundColor: color,
-                scale: 0.6
+                backgroundColor: color
             });
+            // 2. Move Horizontal along wire
             tl.to(packet, {
-                top: startL1.offsetTop + startL1.offsetHeight + 10,
-                left: endL1.offsetLeft + (endL1.offsetWidth / 2) - 15,
+                top: wireY,
+                left: endX,
                 duration: wireDur * 0.4,
                 ease: "none"
             });
+            // 3. Move Up to End L1
             tl.to(packet, {
-                top: endL1.offsetTop + 10,
-                left: endL1.offsetLeft + (endL1.offsetWidth / 2) - 15,
+                top: endY,
+                left: endX,
                 duration: wireDur * 0.3,
                 ease: "power1.out"
             });
         } else {
+            // Desktop Linear (if isMobile becomes false)
             tl.to(packet, {
                 left: direction === 'tx' ? '84%' : '16%',
-                top: endL1.offsetTop + 10,
+                top: endY,
                 duration: wireDur,
                 ease: "none",
                 backgroundColor: color,
