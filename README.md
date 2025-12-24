@@ -2,6 +2,8 @@
 
 Aplikasi web interaktif untuk memvisualisasikan dan mempelajari 7 Layer OSI Model serta perbandingannya dengan TCP/IP Model. Dirancang untuk mahasiswa, pelajar, dan penggiat IT agar lebih mudah memahami konsep jaringan komputer secara visual.
 
+🔗 **Link Demo:** [https://marsanix.github.io/OSI-Model-Visual-Interactive/](https://marsanix.github.io/OSI-Model-Visual-Interactive/)
+
 ## 🚀 Fitur Utama
 
 - **Visualisasi Interaktif**: Klik setiap layer untuk melihat detail mendalam, termasuk deskripsi, PDU (Protocol Data Unit), dan fungsi utamanya.
